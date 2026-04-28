@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
 import {
   Sparkles,
   FileText,
@@ -19,6 +20,8 @@ import {
   ArrowRight,
   RefreshCw,
   Download,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -138,6 +141,8 @@ function formatDate(dateStr: string): string {
 // --- Main Component ---
 export default function Home() {
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("");
   const [topic, setTopic] = useState<string>("");
   const [selectedTone, setSelectedTone] = useState<string>("");
@@ -147,6 +152,11 @@ export default function Home() {
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [loadingHistory, setLoadingHistory] = useState<boolean>(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Fetch history
   const fetchHistory = useCallback(async () => {
@@ -287,7 +297,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-800 to-indigo-900 flex items-center justify-center shadow-lg shadow-blue-800/30">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
             </div>
@@ -300,20 +310,43 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowHistory(!showHistory)}
-            className="gap-2"
-          >
-            <Clock className="h-4 w-4" />
-            <span className="hidden sm:inline">Histórico</span>
-            {history.length > 0 && (
-              <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-                {history.length}
-              </Badge>
+          <div className="flex items-center gap-2">
+            {/* Dark Mode Toggle */}
+            {mounted && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="gap-2"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Sun className="h-4 w-4" />
+                    <span className="hidden sm:inline">Claro</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="h-4 w-4" />
+                    <span className="hidden sm:inline">Noturno</span>
+                  </>
+                )}
+              </Button>
             )}
-          </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowHistory(!showHistory)}
+              className="gap-2"
+            >
+              <Clock className="h-4 w-4" />
+              <span className="hidden sm:inline">Histórico</span>
+              {history.length > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                  {history.length}
+                </Badge>
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -327,7 +360,7 @@ export default function Home() {
         >
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight mb-3">
             Crie conteúdo incrível
-            <span className="bg-gradient-to-r from-emerald-500 to-teal-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">
               {" "}com IA
             </span>
           </h2>
@@ -345,10 +378,10 @@ export default function Home() {
             className="space-y-6"
           >
             {/* Step 1: Content Type */}
-            <Card className="border-2 hover:border-emerald-500/30 transition-colors">
+            <Card className="border-2 hover:border-blue-800/30 transition-colors">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <span className="h-6 w-6 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center font-bold">
+                  <span className="h-6 w-6 rounded-full bg-blue-800 text-white text-xs flex items-center justify-center font-bold">
                     1
                   </span>
                   Tipo de Conteúdo
@@ -362,8 +395,8 @@ export default function Home() {
                       onClick={() => setSelectedType(type.id)}
                       className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200 text-center group hover:scale-[1.02] ${
                         selectedType === type.id
-                          ? "border-emerald-500 bg-emerald-500/10 shadow-md shadow-emerald-500/10"
-                          : "border-border hover:border-emerald-500/40 bg-card"
+                          ? "border-blue-800 bg-blue-800/10 shadow-md shadow-blue-800/10"
+                          : "border-border hover:border-blue-800/40 bg-card"
                       }`}
                     >
                       <span className="text-2xl">{type.emoji}</span>
@@ -371,7 +404,7 @@ export default function Home() {
                       {selectedType === type.id && (
                         <motion.div
                           layoutId="typeIndicator"
-                          className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center"
+                          className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-blue-800 flex items-center justify-center"
                         >
                           <Check className="h-3 w-3 text-white" />
                         </motion.div>
@@ -383,10 +416,10 @@ export default function Home() {
             </Card>
 
             {/* Step 2: Topic */}
-            <Card className="border-2 hover:border-emerald-500/30 transition-colors">
+            <Card className="border-2 hover:border-blue-800/30 transition-colors">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <span className="h-6 w-6 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center font-bold">
+                  <span className="h-6 w-6 rounded-full bg-blue-800 text-white text-xs flex items-center justify-center font-bold">
                     2
                   </span>
                   Sobre o que é o conteúdo?
@@ -406,10 +439,10 @@ export default function Home() {
             </Card>
 
             {/* Step 3: Tone */}
-            <Card className="border-2 hover:border-emerald-500/30 transition-colors">
+            <Card className="border-2 hover:border-blue-800/30 transition-colors">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <span className="h-6 w-6 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center font-bold">
+                  <span className="h-6 w-6 rounded-full bg-blue-800 text-white text-xs flex items-center justify-center font-bold">
                     3
                   </span>
                   Tom do Conteúdo
@@ -423,8 +456,8 @@ export default function Home() {
                       onClick={() => setSelectedTone(tone.id)}
                       className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all duration-200 ${
                         selectedTone === tone.id
-                          ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 shadow-md shadow-emerald-500/10"
-                          : "border-border hover:border-emerald-500/40 bg-card"
+                          ? "border-blue-800 bg-blue-800/10 text-blue-900 dark:text-blue-300 shadow-md shadow-blue-800/10"
+                          : "border-border hover:border-blue-800/40 bg-card"
                       }`}
                     >
                       {tone.label}
@@ -438,7 +471,7 @@ export default function Home() {
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !selectedType || !topic.trim() || !selectedTone}
-              className="w-full h-14 text-base font-semibold gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50"
+              className="w-full h-14 text-base font-semibold gap-2 bg-gradient-to-r from-blue-800 to-indigo-900 hover:from-blue-900 hover:to-indigo-950 text-white shadow-lg shadow-blue-800/30 transition-all duration-200 disabled:opacity-50"
               size="lg"
             >
               {isGenerating ? (
@@ -466,7 +499,7 @@ export default function Home() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-emerald-500" />
+                    <Sparkles className="h-4 w-4 text-blue-800 dark:text-blue-400" />
                     Conteúdo Gerado
                   </CardTitle>
                   {generatedContent && (
@@ -478,7 +511,7 @@ export default function Home() {
                         className="h-8 gap-1.5 text-xs"
                       >
                         {copied ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                          <Check className="h-3.5 w-3.5 text-blue-800 dark:text-blue-400" />
                         ) : (
                           <Copy className="h-3.5 w-3.5" />
                         )}
@@ -507,8 +540,8 @@ export default function Home() {
                   <div className="flex-1 flex items-center justify-center">
                     <div className="text-center space-y-4">
                       <div className="relative mx-auto">
-                        <div className="h-16 w-16 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin mx-auto" />
-                        <Sparkles className="h-6 w-6 text-emerald-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                        <div className="h-16 w-16 rounded-full border-4 border-blue-800/20 border-t-blue-800 animate-spin mx-auto" />
+                        <Sparkles className="h-6 w-6 text-blue-800 dark:text-blue-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                       </div>
                       <div>
                         <p className="font-medium text-sm">Criando seu conteúdo...</p>
@@ -586,7 +619,7 @@ export default function Home() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-emerald-500" />
+                      <Clock className="h-4 w-4 text-blue-800 dark:text-blue-400" />
                       Histórico de Conteúdos
                     </CardTitle>
                     <div className="flex gap-2">
