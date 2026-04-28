@@ -109,8 +109,8 @@ async function generateWithGemini(systemPrompt: string, userPrompt: string): Pro
 
   if (!response.ok) {
     const errorData = await response.text();
-    console.error("Gemini API error:", errorData);
-    throw new Error("Erro na API do Gemini. Verifique sua API Key.");
+    console.error("Gemini API error:", response.status, errorData);
+    throw new Error(`Erro na API do Gemini (${response.status}): ${errorData}`);
   }
 
   const data = await response.json();
